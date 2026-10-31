@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MetalForce — Manutenção Industrial & Soldas</title>
+<style>
+/* ── TOKENS ── */
+:root{
+  --steel:#1A1F2E;        /* fundo principal — aço escuro */
+  --steel-mid:#242A3A;    /* cards */
+  --steel-light:#2E3650;  /* bordas / hover */
+  --spark:#F97316;        /* laranja faísca — acento principal */
+  --spark-d:#C2590E;
+  --spark-glow:rgba(249,115,22,.18);
+  --iron:#8B98B3;         /* texto secundário */
+  --white:#F4F6FA;
+  --white-dim:rgba(244,246,250,.06);
+  --radius:14px;
+  --radius-lg:22px;
+  --font-display:'Barlow Condensed',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+  --shadow-spark:0 0 40px rgba(249,115,22,.25);
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--steel);color:var(--white);font-family:var(--font-body);line-height:1.6;overflow-x:hidden}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 5%;background:rgba(26,31,46,.85);backdrop-filter:blur(16px);border-bottom:1px solid rgba(249,115,22,.12);display:flex;align-items:center;height:66px}
+.nav-logo{font-family:var(--font-display);font-size:24px;font-weight:900;color:var(--white);letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+.nav-logo span{color:var(--spark)}
+.logo-mark{width:32px;height:32px;background:var(--spark);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.nav-links{display:flex;gap:28px;margin-left:auto;align-items:center}
+.nav-links a{font-size:13px;font-weight:500;color:var(--iron);text-decoration:none;transition:color .15s;letter-spacing:.02em}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{background:var(--spark);color:white;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;transition:all .15s;letter-spacing:.03em}
+.nav-cta:hover{background:var(--spark-d);color:white}
+.burger{display:none;background:none;border:none;color:var(--white);font-size:22px;cursor:pointer;margin-left:auto}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;align-items:center;padding:100px 5% 60px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;z-index:0}
+/* Solda arco simulada com gradientes */
+.hero-bg::before{content:'';position:absolute;inset:0;background:
+  radial-gradient(ellipse 700px 500px at 75% 40%, rgba(249,115,22,.08) 0%, transparent 70%),
+  radial-gradient(ellipse 400px 300px at 80% 35%, rgba(249,115,22,.15) 0%, transparent 50%),
+  linear-gradient(135deg, #0D1119 0%, var(--steel) 50%, #1A2A3A 100%)}
+/* Grid de metal */
+.hero-bg::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(139,152,179,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(139,152,179,.04) 1px,transparent 1px);background-size:40px 40px}
+.hero-content{position:relative;z-index:1;max-width:640px}
+.hero-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--spark);margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.hero-eyebrow::before{content:'';width:28px;height:2px;background:var(--spark)}
+.hero-h1{font-family:var(--font-display);font-size:clamp(52px,8vw,96px);font-weight:900;line-height:.95;letter-spacing:-.01em;text-transform:uppercase;margin-bottom:24px}
+.hero-h1 .accent{color:var(--spark);display:block}
+.hero-desc{font-size:17px;color:var(--iron);max-width:480px;margin-bottom:36px;line-height:1.7}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn-primary{background:var(--spark);color:white;padding:14px 28px;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none;transition:all .2s;letter-spacing:.04em;display:inline-flex;align-items:center;gap:8px;border:none;cursor:pointer;font-family:var(--font-body)}
+.btn-primary:hover{background:var(--spark-d);transform:translateY(-1px);box-shadow:var(--shadow-spark)}
+.btn-outline{background:transparent;color:var(--white);padding:14px 28px;border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;border:1.5px solid rgba(244,246,250,.2);transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-outline:hover{border-color:var(--spark);color:var(--spark)}
+.hero-stats{display:flex;gap:36px;margin-top:56px;flex-wrap:wrap}
+.hero-stat-n{font-family:var(--font-display);font-size:40px;font-weight:900;color:var(--white);line-height:1}
+.hero-stat-l{font-size:12px;color:var(--iron);margin-top:4px;font-weight:500}
+.hero-stat{position:relative;padding-right:36px}
+.hero-stat::after{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);height:36px;width:1px;background:rgba(139,152,179,.2)}
+.hero-stat:last-child::after{display:none}
+/* Spark visual */
+.spark-visual{position:absolute;right:5%;top:50%;transform:translateY(-50%);z-index:1;display:flex;flex-direction:column;align-items:center;gap:0}
+.weld-icon{font-size:120px;filter:drop-shadow(0 0 40px rgba(249,115,22,.5));animation:flicker 3s ease-in-out infinite}
+@keyframes flicker{0%,100%{filter:drop-shadow(0 0 40px rgba(249,115,22,.5));transform:scale(1)}50%{filter:drop-shadow(0 0 60px rgba(249,115,22,.8));transform:scale(1.04)}}
+
+/* ── SECTIONS ── */
+section{padding:80px 5%}
+.section-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--spark);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-eyebrow::before{content:'';width:20px;height:2px;background:var(--spark)}
+.section-title{font-family:var(--font-display);font-size:clamp(36px,5vw,56px);font-weight:800;line-height:1.05;text-transform:uppercase;margin-bottom:16px;letter-spacing:-.01em}
+.section-sub{font-size:16px;color:var(--iron);max-width:520px;line-height:1.7}
+
+/* ── SERVIÇOS ── */
+.services{background:var(--steel-mid)}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:48px}
+.service-card{background:var(--white-dim);border:1px solid rgba(139,152,179,.12);border-radius:var(--radius);padding:28px;transition:all .25s;cursor:pointer;position:relative;overflow:hidden}
+.service-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--spark);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.service-card:hover{border-color:rgba(249,115,22,.3);background:rgba(249,115,22,.06);transform:translateY(-3px)}
+.service-card:hover::before{transform:scaleX(1)}
+.service-ico{font-size:36px;margin-bottom:16px;display:block}
+.service-title{font-family:var(--font-display);font-size:20px;font-weight:800;text-transform:uppercase;margin-bottom:10px;letter-spacing:.02em}
+.service-desc{font-size:13px;color:var(--iron);line-height:1.7}
+.service-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:14px}
+.service-tag{background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.2);color:var(--spark);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.04em}
+
+/* ── DIFERENCIAIS ── */
+.diferenciais-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:56px;align-items:center}
+.dif-list{display:flex;flex-direction:column;gap:20px}
+.dif-item{display:flex;gap:16px;align-items:flex-start}
+.dif-ico-wrap{width:44px;height:44px;background:var(--spark-glow);border:1px solid rgba(249,115,22,.25);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;margin-top:2px}
+.dif-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.dif-desc{font-size:13px;color:var(--iron);line-height:1.6}
+.dif-visual{background:var(--steel-mid);border:1px solid rgba(139,152,179,.1);border-radius:var(--radius-lg);padding:32px;display:flex;flex-direction:column;gap:14px}
+.dif-stat-row{display:flex;align-items:center;gap:14px;padding:14px;background:var(--white-dim);border-radius:10px}
+.dif-stat-ico{font-size:24px;flex-shrink:0}
+.dif-stat-bar-wrap{flex:1}
+.dif-stat-label{font-size:11px;color:var(--iron);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.dif-stat-bar{height:6px;background:rgba(139,152,179,.1);border-radius:3px;overflow:hidden}
+.dif-stat-fill{height:100%;border-radius:3px;background:var(--spark)}
+.dif-stat-val{font-size:16px;font-weight:800;color:var(--spark);flex-shrink:0;font-family:var(--font-display)}
+
+/* ── PROCESSO ── */
+.processo{background:var(--steel-mid)}
+.processo-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0;margin-top:56px;position:relative}
+.processo-steps::before{content:'';position:absolute;top:32px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--spark),transparent);opacity:.3}
+.step{text-align:center;padding:24px 16px;position:relative}
+.step-num{width:64px;height:64px;border-radius:50%;background:var(--spark-glow);border:2px solid var(--spark);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:24px;font-weight:900;color:var(--spark);margin:0 auto 16px}
+.step-title{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.step-desc{font-size:12px;color:var(--iron);line-height:1.6;max-width:160px;margin:0 auto}
+
+/* ── SEGMENTOS ── */
+.segmentos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:48px}
+.seg-card{background:var(--white-dim);border:1px solid rgba(139,152,179,.1);border-radius:var(--radius);padding:20px 16px;text-align:center;transition:all .2s;cursor:pointer}
+.seg-card:hover{border-color:rgba(249,115,22,.3);background:rgba(249,115,22,.06)}
+.seg-ico{font-size:28px;margin-bottom:10px;display:block}
+.seg-name{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--white)}
+.seg-sub{font-size:11px;color:var(--iron);margin-top:4px}
+
+/* ── DEPOIMENTOS ── */
+.dep{background:var(--steel-mid)}
+.dep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:48px}
+.dep-card{background:var(--steel);border:1px solid rgba(139,152,179,.1);border-radius:var(--radius);padding:24px;position:relative}
+.dep-stars{color:var(--spark);font-size:14px;margin-bottom:12px;letter-spacing:2px}
+.dep-text{font-size:14px;color:var(--iron);line-height:1.7;font-style:italic;margin-bottom:16px}
+.dep-author{display:flex;align-items:center;gap:10px}
+.dep-avatar{width:38px;height:38px;border-radius:50%;background:var(--spark-glow);border:1px solid rgba(249,115,22,.3);display:flex;align-items:center;justify-content:center;font-size:16px}
+.dep-name{font-size:13px;font-weight:700}
+.dep-role{font-size:11px;color:var(--iron)}
+.dep-quote{position:absolute;top:20px;right:20px;font-size:40px;color:rgba(249,115,22,.12);font-family:serif;line-height:1}
+
+/* ── CTA ── */
+.cta-section{background:linear-gradient(135deg,var(--spark-d) 0%,var(--spark) 50%,#FDBA74 100%);padding:80px 5%;text-align:center;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+.cta-section .section-title{color:white;text-shadow:0 2px 20px rgba(0,0,0,.2)}
+.cta-section p{font-size:18px;color:rgba(255,255,255,.85);max-width:500px;margin:0 auto 36px;line-height:1.7}
+.btn-white{background:white;color:var(--spark-d);padding:15px 32px;border-radius:10px;font-size:15px;font-weight:800;text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.03em}
+.btn-white:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.2)}
+
+/* ── CONTATO ── */
+.contato-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:56px;align-items:start}
+.contato-info{display:flex;flex-direction:column;gap:20px}
+.contato-item{display:flex;align-items:flex-start;gap:14px}
+.contato-ico{width:42px;height:42px;background:var(--spark-glow);border:1px solid rgba(249,115,22,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.contato-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--spark);margin-bottom:3px}
+.contato-val{font-size:14px;color:var(--white)}
+.contato-form{background:var(--steel-mid);border:1px solid rgba(139,152,179,.1);border-radius:var(--radius-lg);padding:28px;display:flex;flex-direction:column;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--iron)}
+.form-input,.form-select,.form-textarea{background:var(--white-dim);border:1px solid rgba(139,152,179,.15);border-radius:9px;padding:11px 14px;font-size:13px;color:var(--white);font-family:var(--font-body);outline:none;transition:border-color .15s;width:100%}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:rgba(249,115,22,.5)}
+.form-select{cursor:pointer}
+.form-select option{background:var(--steel-mid)}
+.form-textarea{resize:vertical;min-height:90px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-submit{background:var(--spark);color:white;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition:all .2s;letter-spacing:.04em;width:100%}
+.form-submit:hover{background:var(--spark-d);transform:translateY(-1px)}
+
+/* ── FOOTER ── */
+footer{background:#0D1119;padding:48px 5% 24px;border-top:1px solid rgba(139,152,179,.08)}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.footer-brand{font-family:var(--font-display);font-size:22px;font-weight:900;margin-bottom:12px;display:flex;align-items:center;gap:9px}
+.footer-brand span{color:var(--spark)}
+.footer-desc{font-size:13px;color:var(--iron);line-height:1.7;margin-bottom:16px}
+.footer-social{display:flex;gap:10px}
+.social-btn{width:36px;height:36px;background:var(--white-dim);border:1px solid rgba(139,152,179,.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .15s}
+.social-btn:hover{border-color:var(--spark);background:var(--spark-glow)}
+.footer-col-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--spark);margin-bottom:16px}
+.footer-links{display:flex;flex-direction:column;gap:9px}
+.footer-links a{font-size:13px;color:var(--iron);text-decoration:none;transition:color .15s}
+.footer-links a:hover{color:var(--white)}
+.footer-bottom{border-top:1px solid rgba(139,152,179,.08);padding-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.footer-copy{font-size:12px;color:var(--iron)}
+.footer-cert{display:flex;gap:10px}
+.cert-badge{background:var(--spark-glow);border:1px solid rgba(249,115,22,.2);border-radius:6px;padding:4px 10px;font-size:10px;font-weight:700;color:var(--spark);letter-spacing:.06em}
+
+/* ── WHATSAPP FLOAT ── */
+.wa-float{position:fixed;bottom:24px;right:24px;z-index:200;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.wa-btn{width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;box-shadow:0 4px 20px rgba(37,211,102,.4);transition:transform .2s;text-decoration:none}
+.wa-btn:hover{transform:scale(1.1)}
+.wa-label{background:var(--steel-mid);border:1px solid rgba(139,152,179,.15);border-radius:8px;padding:7px 12px;font-size:12px;font-weight:600;color:var(--white);white-space:nowrap;display:none}
+.wa-float:hover .wa-label{display:block}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .nav-links{display:none}
+  .burger{display:block}
+  .nav-links.open{display:flex;flex-direction:column;position:fixed;top:66px;left:0;right:0;background:var(--steel-mid);padding:20px 5%;gap:16px;border-bottom:1px solid rgba(139,152,179,.1)}
+  .hero{padding-top:120px}
+  .spark-visual{display:none}
+  .diferenciais-grid,.contato-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .hero-h1{font-size:52px}
+  .hero-stats{gap:20px}
+  .form-row{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr}
+  .processo-steps{grid-template-columns:1fr 1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  .weld-icon{animation:none}
+  *{transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="logo-mark">🔩</div>
+    METAL<span>FORCE</span>
+  </div>
+  <div class="nav-links" id="navLinks">
+    <a href="#servicos">Serviços</a>
+    <a href="#diferenciais">Diferenciais</a>
+    <a href="#processo">Processo</a>
+    <a href="#segmentos">Segmentos</a>
+    <a href="#contato" class="nav-cta">Solicitar orçamento</a>
+  </div>
+  <button class="burger" id="burger" aria-label="Menu" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Manutenção industrial & soldas</div>
+    <h1 class="hero-h1">
+      SOLDAMOS<br>
+      <span class="accent">O FUTURO</span>
+      DA SUA PLANTA
+    </h1>
+    <p class="hero-desc">Manutenção mecânica, soldas especiais e serviços industriais com equipe certificada, atendimento 24h e resposta rápida para paradas de produção.</p>
+    <div class="hero-actions">
+      <a href="#contato" class="btn-primary">🔥 Solicitar orçamento grátis</a>
+      <a href="#servicos" class="btn-outline">Ver serviços</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-n">+2.400</div>
+        <div class="hero-stat-l">Serviços executados</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-n">98,7%</div>
+        <div class="hero-stat-l">Satisfação dos clientes</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-n">24h</div>
+        <div class="hero-stat-l">Atendimento emergencial</div>
+      </div>
+    </div>
+  </div>
+  <div class="spark-visual">
+    <div class="weld-icon">⚡</div>
+  </div>
+</section>
+
+<!-- SERVIÇOS -->
+<section class="services" id="servicos">
+  <div class="section-eyebrow">O que fazemos</div>
+  <h2 class="section-title">Serviços<br>especializados</h2>
+  <p class="section-sub">Cobertura completa para manutenção industrial — da inspeção ao retorno à produção.</p>
+  <div class="services-grid">
+    <div class="service-card">
+      <span class="service-ico">🔥</span>
+      <div class="service-title">Soldagem industrial</div>
+      <p class="service-desc">Soldagem MIG, TIG, eletrodo revestido, solda subaquática e soldagem em campo. Qualificação AWS e ASME.</p>
+      <div class="service-tags">
+        <span class="service-tag">MIG/MAG</span>
+        <span class="service-tag">TIG</span>
+        <span class="service-tag">SMAW</span>
+        <span class="service-tag">AWS D1.1</span>
+      </div>
+    </div>
+    <div class="service-card">
+      <span class="service-ico">⚙️</span>
+      <div class="service-title">Manutenção mecânica</div>
+      <p class="service-desc">Preventiva, preditiva e corretiva de equipamentos rotativos, redutores, bombas, compressores e conjuntos industriais.</p>
+      <div class="service-tags">
+        <span class="service-tag">Preventiva</span>
+        <span class="service-tag">Preditiva</span>
+        <span class="service-tag">Corretiva</span>
+      </div>
+    </div>
+    <div class="service-card">
+      <span class="service-ico">🏭</span>
+      <div class="service-title">Estruturas metálicas</div>
+      <p class="service-desc">Fabricação e montagem de estruturas metálicas, plataformas, escadas, suportes e reformas industriais.</p>
+      <div class="service-tags">
+        <span class="service-tag">Fabricação</span>
+        <span class="service-tag">Montagem</span>
+        <span class="service-tag">Reforma</span>
+      </div>
+    </div>
+    <div class="service-card">
+      <span class="service-ico">🔩</span>
+      <div class="service-title">Usinagem e ajuste</div>
+      <p class="service-desc">Torneamento, fresamento, retífica, usinagem em campo e ajuste de componentes mecânicos de precisão.</p>
+      <div class="service-tags">
+        <span class="service-tag">Torneamento</span>
+        <span class="service-tag">Fresamento</span>
+        <span class="service-tag">In-loco</span>
+      </div>
+    </div>
+    <div class="service-card">
+      <span class="service-ico">🌡️</span>
+      <div class="service-title">Caldeiraria pesada</div>
+      <p class="service-desc">Vasos de pressão, caldeiras, trocadores de calor, silos, dutos e equipamentos sob pressão conforme NR-13.</p>
+      <div class="service-tags">
+        <span class="service-tag">NR-13</span>
+        <span class="service-tag">ASME</span>
+        <span class="service-tag">Vasos</span>
+      </div>
+    </div>
+    <div class="service-card">
+      <span class="service-ico">🚨</span>
+      <div class="service-title">Emergência 24h</div>
+      <p class="service-desc">Equipe de plantão para atendimento emergencial em paradas não programadas, com mobilização em até 2 horas.</p>
+      <div class="service-tags">
+        <span class="service-tag">24/7</span>
+        <span class="service-tag">Mobilização rápida</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIFERENCIAIS -->
+<section id="diferenciais">
+  <div class="section-eyebrow">Por que escolher</div>
+  <h2 class="section-title">Diferenciais<br>que entregam</h2>
+  <div class="diferenciais-grid">
+    <div class="dif-list">
+      <div class="dif-item">
+        <div class="dif-ico-wrap">🏆</div>
+        <div>
+          <div class="dif-title">Equipe certificada AWS e CREA</div>
+          <p class="dif-desc">Soldadores qualificados AWS, técnicos com CREA e profissionais de segurança NR-12/NR-13 em todos os serviços.</p>
+        </div>
+      </div>
+      <div class="dif-item">
+        <div class="dif-ico-wrap">⚡</div>
+        <div>
+          <div class="dif-title">Resposta em até 2 horas</div>
+          <p class="dif-desc">Para emergências industriais, mobilizamos equipe completa com equipamentos em até 2 horas no seu raio de atendimento.</p>
+        </div>
+      </div>
+      <div class="dif-item">
+        <div class="dif-ico-wrap">🔍</div>
+        <div>
+          <div class="dif-title">Inspeção e laudo técnico</div>
+          <p class="dif-desc">END (ensaios não destrutivos), ultra-som, líquido penetrante e laudos assinados por responsável técnico habilitado.</p>
+        </div>
+      </div>
+      <div class="dif-item">
+        <div class="dif-ico-wrap">🛡️</div>
+        <div>
+          <div class="dif-title">Segurança em primeiro lugar</div>
+          <p class="dif-desc">APT, LOTO, análise de risco e PPRA em todas as atividades. CIPA ativa e Zero Acidente como meta permanente.</p>
+        </div>
+      </div>
+    </div>
+    <div class="dif-visual">
+      <div style="font-size:13px;font-weight:700;color:var(--iron);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Índices de desempenho</div>
+      <div class="dif-stat-row">
+        <div class="dif-stat-ico">🎯</div>
+        <div class="dif-stat-bar-wrap">
+          <div class="dif-stat-label">Prazo cumprido</div>
+          <div class="dif-stat-bar"><div class="dif-stat-fill" style="width:96%"></div></div>
+        </div>
+        <div class="dif-stat-val">96%</div>
+      </div>
+      <div class="dif-stat-row">
+        <div class="dif-stat-ico">⭐</div>
+        <div class="dif-stat-bar-wrap">
+          <div class="dif-stat-label">Satisfação</div>
+          <div class="dif-stat-bar"><div class="dif-stat-fill" style="width:98%"></div></div>
+        </div>
+        <div class="dif-stat-val">98%</div>
+      </div>
+      <div class="dif-stat-row">
+        <div class="dif-stat-ico">🛡️</div>
+        <div class="dif-stat-bar-wrap">
+          <div class="dif-stat-label">Índice de segurança</div>
+          <div class="dif-stat-bar"><div class="dif-stat-fill" style="width:100%"></div></div>
+        </div>
+        <div class="dif-stat-val">100%</div>
+      </div>
+      <div class="dif-stat-row">
+        <div class="dif-stat-ico">⚙️</div>
+        <div class="dif-stat-bar-wrap">
+          <div class="dif-stat-label">Retrabalho zero</div>
+          <div class="dif-stat-bar"><div class="dif-stat-fill" style="width:99%"></div></div>
+        </div>
+        <div class="dif-stat-val">99%</div>
+      </div>
+      <div style="background:var(--spark-glow);border:1px solid rgba(249,115,22,.2);border-radius:10px;padding:14px;margin-top:4px;text-align:center">
+        <div style="font-family:var(--font-display);font-size:36px;font-weight:900;color:var(--spark)">+15 anos</div>
+        <div style="font-size:12px;color:var(--iron);margin-top:2px">de experiência industrial</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESSO -->
+<section class="processo" id="processo">
+  <div class="section-eyebrow">Como trabalhamos</div>
+  <h2 class="section-title">Do contato à<br>entrega</h2>
+  <p class="section-sub">Um processo transparente, seguro e orientado ao resultado da sua operação.</p>
+  <div class="processo-steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-title">Contato</div>
+      <p class="step-desc">Você faz o contato — WhatsApp, ligação ou formulário. Resposta em até 30 min.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-title">Visita técnica</div>
+      <p class="step-desc">Nosso engenheiro visita o local, avalia o escopo e identifica riscos.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-title">Orçamento</div>
+      <p class="step-desc">Orçamento detalhado com prazo, materiais e plano de execução.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-title">Execução segura</div>
+      <p class="step-desc">APT, LOTO e equipe qualificada em campo. Acompanhamento em tempo real.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">05</div>
+      <div class="step-title">Entrega e laudo</div>
+      <p class="step-desc">Entrega com laudo técnico, ensaios e equipamento funcionando.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SEGMENTOS -->
+<section id="segmentos">
+  <div class="section-eyebrow">Onde atuamos</div>
+  <h2 class="section-title">Segmentos<br>atendidos</h2>
+  <div class="segmentos-grid">
+    <div class="seg-card"><span class="seg-ico">🏭</span><div class="seg-name">Cimenteiras</div><div class="seg-sub">Fornos, moinhos, silos</div></div>
+    <div class="seg-card"><span class="seg-ico">⛏️</span><div class="seg-name">Mineração</div><div class="seg-sub">Britadores, transportadores</div></div>
+    <div class="seg-card"><span class="seg-ico">🌾</span><div class="seg-name">Agronegócio</div><div class="seg-sub">Colheitadeiras, silos</div></div>
+    <div class="seg-card"><span class="seg-ico">⚡</span><div class="seg-name">Energia</div><div class="seg-sub">Usinas, subestações</div></div>
+    <div class="seg-card"><span class="seg-ico">🚗</span><div class="seg-name">Automotivo</div><div class="seg-sub">Estamparia, montagem</div></div>
+    <div class="seg-card"><span class="seg-ico">🧪</span><div class="seg-name">Petroquímica</div><div class="seg-sub">Dutos, vasos, caldeiras</div></div>
+    <div class="seg-card"><span class="seg-ico">🥩</span><div class="seg-name">Frigoríficos</div><div class="seg-sub">NR-36, câmaras, túneis</div></div>
+    <div class="seg-card"><span class="seg-ico">🏗️</span><div class="seg-name">Construção</div><div class="seg-sub">Estruturas, andaimes</div></div>
+  </div>
+</section>
+
+<!-- DEPOIMENTOS -->
+<section class="dep">
+  <div class="section-eyebrow">Quem confia</div>
+  <h2 class="section-title">O que nossos<br>clientes dizem</h2>
+  <div class="dep-grid">
+    <div class="dep-card">
+      <div class="dep-quote">"</div>
+      <div class="dep-stars">★★★★★</div>
+      <p class="dep-text">Atenderam nossa parada emergencial em menos de 3 horas. Soldagem de qualidade, laudo impecável e voltamos à produção no prazo. Parceiros de confiança.</p>
+      <div class="dep-author">
+        <div class="dep-avatar">🏭</div>
+        <div><div class="dep-name">Gerência Industrial</div><div class="dep-role">Cimenteira — Mato Grosso do Sul</div></div>
+      </div>
+    </div>
+    <div class="dep-card">
+      <div class="dep-quote">"</div>
+      <div class="dep-stars">★★★★★</div>
+      <p class="dep-text">Contratamos para manutenção preventiva completa do moinho. Trabalho criterioso, equipe segura e documentação em dia. Recomendo sem hesitar.</p>
+      <div class="dep-author">
+        <div class="dep-avatar">⚙️</div>
+        <div><div class="dep-name">Gerente de Manutenção</div><div class="dep-role">Mineradora — Minas Gerais</div></div>
+      </div>
+    </div>
+    <div class="dep-card">
+      <div class="dep-quote">"</div>
+      <div class="dep-stars">★★★★★</div>
+      <p class="dep-text">Estrutura metálica complexa entregue no prazo com qualidade de acabamento excepcional. A equipe tem domínio técnico e compromisso com a segurança.</p>
+      <div class="dep-author">
+        <div class="dep-avatar">🏗️</div>
+        <div><div class="dep-name">Diretor de Operações</div><div class="dep-role">Indústria Alimentícia — São Paulo</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section">
+  <h2 class="section-title" style="color:white;margin-bottom:16px">PARADA DE PRODUÇÃO?<br>LIGAMOS EM 30 MINUTOS.</h2>
+  <p>Nosso time de emergência está de plantão 24 horas por dia, 7 dias por semana, para minimizar seu tempo de parada.</p>
+  <a href="https://wa.me/5567999999999?text=Emergência%20industrial%20-%20preciso%20de%20atendimento%20urgente" class="btn-white" target="_blank">📲 Chamar agora no WhatsApp</a>
+</div>
+
+<!-- CONTATO -->
+<section id="contato">
+  <div class="section-eyebrow">Fale com a gente</div>
+  <h2 class="section-title">Solicite seu<br>orçamento</h2>
+  <div class="contato-grid">
+    <div class="contato-info">
+      <div class="contato-item">
+        <div class="contato-ico">📞</div>
+        <div><div class="contato-label">Telefone / WhatsApp</div><div class="contato-val">(67) 9 9999-9999</div></div>
+      </div>
+      <div class="contato-item">
+        <div class="contato-ico">📧</div>
+        <div><div class="contato-label">E-mail</div><div class="contato-val">contato@metalforce.com.br</div></div>
+      </div>
+      <div class="contato-item">
+        <div class="contato-ico">📍</div>
+        <div><div class="contato-label">Localização</div><div class="contato-val">Bodoquena / MS — Atendimento regional e em todo Brasil</div></div>
+      </div>
+      <div class="contato-item">
+        <div class="contato-ico">🕐</div>
+        <div><div class="contato-label">Horário comercial</div><div class="contato-val">Seg–Sex 07h às 18h · Emergência 24h</div></div>
+      </div>
+      <div style="background:var(--spark-glow);border:1px solid rgba(249,115,22,.2);border-radius:var(--radius);padding:18px;margin-top:8px">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--spark);margin-bottom:8px">Certificações</div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px">
+          <span style="background:var(--white-dim);border:1px solid rgba(139,152,179,.15);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--white)">AWS D1.1</span>
+          <span style="background:var(--white-dim);border:1px solid rgba(139,152,179,.15);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--white)">ASME IX</span>
+          <span style="background:var(--white-dim);border:1px solid rgba(139,152,179,.15);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--white)">NR-12</span>
+          <span style="background:var(--white-dim);border:1px solid rgba(139,152,179,.15);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--white)">NR-13</span>
+          <span style="background:var(--white-dim);border:1px solid rgba(139,152,179,.15);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--white)">ISO 9001</span>
+          <span style="background:var(--white-dim);border:1px solid rgba(139,152,179,.15);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--white)">CREA/MS</span>
+        </div>
+      </div>
+    </div>
+    <div class="contato-form">
+      <div style="font-size:16px;font-weight:800;margin-bottom:4px;font-family:var(--font-display);letter-spacing:.03em;text-transform:uppercase">Solicitar orçamento</div>
+      <div style="font-size:12px;color:var(--iron);margin-bottom:4px">Resposta em até 2 horas em dias úteis</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" type="text" placeholder="Seu nome"></div>
+        <div class="form-group"><label class="form-label">Empresa</label><input class="form-input" type="text" placeholder="Nome da empresa"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" type="tel" placeholder="(67) 9 9999-9999"></div>
+        <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" placeholder="seu@email.com"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de serviço</label>
+        <select class="form-select form-input">
+          <option value="">Selecione...</option>
+          <option>Soldagem industrial</option>
+          <option>Manutenção mecânica preventiva</option>
+          <option>Manutenção corretiva / Emergência</option>
+          <option>Estruturas metálicas</option>
+          <option>Caldeiraria</option>
+          <option>Usinagem e ajuste</option>
+          <option>Outro serviço</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrição do serviço</label>
+        <textarea class="form-textarea" placeholder="Descreva o que precisa — equipamento, problema, urgência..."></textarea>
+      </div>
+      <button class="form-submit" onclick="alert('Orçamento enviado! Retornaremos em até 2 horas.')">🔥 Enviar solicitação</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">🔩 METAL<span>FORCE</span></div>
+      <p class="footer-desc">Manutenção mecânica industrial, soldagem especializada e serviços técnicos com excelência, segurança e agilidade para sua operação continuar.</p>
+      <div class="footer-social">
+        <div class="social-btn" title="WhatsApp">📲</div>
+        <div class="social-btn" title="Instagram">📷</div>
+        <div class="social-btn" title="LinkedIn">💼</div>
+        <div class="social-btn" title="Facebook">👥</div>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Serviços</div>
+      <div class="footer-links">
+        <a href="#">Soldagem industrial</a>
+        <a href="#">Manutenção mecânica</a>
+        <a href="#">Estruturas metálicas</a>
+        <a href="#">Caldeiraria</a>
+        <a href="#">Usinagem e ajuste</a>
+        <a href="#">Emergência 24h</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Empresa</div>
+      <div class="footer-links">
+        <a href="#">Sobre nós</a>
+        <a href="#">Nossa equipe</a>
+        <a href="#">Certificações</a>
+        <a href="#">Portfólio</a>
+        <a href="#">Carreiras</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Contato</div>
+      <div class="footer-links">
+        <a href="#">(67) 9 9999-9999</a>
+        <a href="#">contato@metalforce.com.br</a>
+        <a href="#">Bodoquena / MS</a>
+        <a href="#">Emergência 24h</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 MetalForce Manutenção Industrial. Todos os direitos reservados.</div>
+    <div class="footer-cert">
+      <span class="cert-badge">AWS D1.1</span>
+      <span class="cert-badge">NR-12</span>
+      <span class="cert-badge">ISO 9001</span>
+    </div>
+  </div>
+</footer>
+
+<!-- WHATSAPP FLOAT -->
+<div class="wa-float">
+  <div class="wa-label">Chamar no WhatsApp</div>
+  <a class="wa-btn" href="https://wa.me/5567999999999" target="_blank" title="WhatsApp">💬</a>
+</div>
+
+<script>
+// Smooth counter animation on scroll
+function animateCounters(){
+  document.querySelectorAll('.hero-stat-n').forEach(function(el){
+    var text = el.textContent.trim();
+    var num = parseFloat(text.replace(/[^0-9.]/g,''));
+    if(isNaN(num)) return;
+    var suffix = text.replace(/[0-9.]/g,'');
+    var dur = 1200, steps = 40, inc = num/steps;
+    var cur = 0, i = 0;
+    var timer = setInterval(function(){
+      cur = Math.min(cur+inc, num);
+      el.textContent = (cur%1===0 ? Math.round(cur) : cur.toFixed(1)) + suffix;
+      if(++i>=steps) clearInterval(timer);
+    }, dur/steps);
+  });
+}
+
+// Progress bars animate on scroll
+function animateBars(){
+  document.querySelectorAll('.dif-stat-fill').forEach(function(el){
+    var w = el.getAttribute('style').match(/width:(\d+)%/);
+    if(w){ el.style.width='0'; setTimeout(function(){ el.style.transition='width 1.2s ease'; el.style.width=w[1]+'%'; },100); }
+  });
+}
+
+var observed = false;
+var observer = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting && !observed){ observed=true; animateCounters(); animateBars(); }
+  });
+},{threshold:.3});
+var hero = document.querySelector('.hero-stats');
+if(hero) observer.observe(hero);
+
+// Nav active state
+window.addEventListener('scroll',function(){
+  var nav = document.querySelector('nav');
+  if(window.scrollY>50) nav.style.background='rgba(13,17,25,.97)';
+  else nav.style.background='rgba(26,31,46,.85)';
+});
+</script>
+</body>
+</html>
